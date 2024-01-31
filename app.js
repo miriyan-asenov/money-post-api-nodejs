@@ -9,10 +9,15 @@ const transferSchema = new mongoose.Schema({
 	sender: {type: String}
 });
 
-const Transfer = mongoose.model('Transfer', transferSchema); 
+const Transfer = mongoose.model('Transfer', transferSchema);
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
+app.use(express.json()); 
+
+app.post('/transfers', (req, res) => {
+	const { amount, receiver, sender } = req.body;
+		 
+	Transfer.create({ amount, receiver, sender })
+			.then(data => res.status(201).json({status: "success", data}));		  
 });
 
 mongoose.connect('mongodb+srv://masenov3377:CAL4y0ZeSodTjmND@cluster0.n5ty6uk.mongodb.net/myMoneyPostDB?retryWrites=true&w=majority')
