@@ -32,6 +32,12 @@ app.get('/transfers/:receiver/deposits', (req, res) => {
 			.then(data => res.status(200).json({status: "success", data}));	 
 });
 
+app.get('/transfers/:receiver/withdrawals', (req, res) => {
+	
+	Transfer.find( {receiver: req.params.receiver, amount: {$lt: 0}} )				 
+			.then(data => res.status(200).json({status: "success", data}));	 
+});
+
 mongoose.connect('mongodb+srv://masenov3377:CAL4y0ZeSodTjmND@cluster0.n5ty6uk.mongodb.net/myMoneyPostDB?retryWrites=true&w=majority')
 		.then(() => app.listen( port, () => {console.log(`Example app listening on port ${port}`);} ) );
 
