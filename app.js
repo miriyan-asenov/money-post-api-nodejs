@@ -3,6 +3,16 @@ const mongoose = require('mongoose');
 const app = express();
 const port = 3000;
 
+const userSchema = new mongoose.Schema({
+		name: { type: String, required: true },
+		idCardNumber: { type: String, required: true },
+		phoneNumber: { type: String, required: true },
+		username: { type: String, required: true },		
+		password: { type: String, required: true }
+});
+
+const User = mongoose.model('User', userSchema);
+
 const transferSchema = new mongoose.Schema({
 	amount: {type: Number, required: true},
 	receiver: {type: String, required: true},
