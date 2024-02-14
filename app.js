@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 const app = express();
 const port = 3000;
 
@@ -8,7 +9,8 @@ const userSchema = new mongoose.Schema({
 		idCardNumber: { type: String, required: true },
 		phoneNumber: { type: String, required: true },
 		username: { type: String, required: true },		
-		password: { type: String, required: true }
+		password: { type: String, required: true },
+		role: { type: String, enum: ['user', 'admin'], default: 'user'}
 });
 
 const User = mongoose.model('User', userSchema);
