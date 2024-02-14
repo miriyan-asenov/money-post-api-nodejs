@@ -6,9 +6,9 @@ const port = 3000;
 
 const userSchema = new mongoose.Schema({
 		name: { type: String, required: true },
-		idCardNumber: { type: String, required: true },
-		phoneNumber: { type: String, required: true },
-		username: { type: String, required: true },		
+		idCardNumber: { type: String, required: true, unique: true },
+		phoneNumber: { type: String, required: true, unique: true },
+		username: { type: String, required: true, unique: true },		
 		password: { type: String, required: true },
 		role: { type: String, enum: ['user', 'admin'], default: 'user'}
 });
@@ -24,6 +24,14 @@ const transferSchema = new mongoose.Schema({
 const Transfer = mongoose.model('Transfer', transferSchema);
 
 app.use(express.json()); 
+
+app.post('users/signup', (req, res) => {
+	const {name, idCardNumber, phoneNumber, username, password, role} = req.body;
+		 
+	bcrypt.hash(password, 12)
+		.then(hashedP => User.create({name, idCardNumber, phoneNumber, username, password: hashedP, role}))
+		.then(data => res.status(201).json({status: "success", data}))
+});
 
 app.post('/transfers', (req, res) => {
 	const { amount, receiver, sender } = req.body;
