@@ -25,12 +25,12 @@ const Transfer = mongoose.model('Transfer', transferSchema);
 
 app.use(express.json()); 
 
-app.post('users/signup', (req, res) => {
+app.post('/users/signup', (req, res) => {
 	const {name, idCardNumber, phoneNumber, username, password, role} = req.body;
 		 
 	bcrypt.hash(password, 12)
 		.then(hashedP => User.create({name, idCardNumber, phoneNumber, username, password: hashedP, role}))
-		.then(data => res.status(201).json({status: "success", data}))
+		.then(data => res.status(201).json({status: "success", data}));
 });
 
 app.post('/transfers', (req, res) => {
