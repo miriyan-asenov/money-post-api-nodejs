@@ -35,6 +35,12 @@ app.post('/users/signup', (req, res) => {
 		.then(data => res.status(201).json({status: "success", data}));
 });
 
+app.get('/users', (req, res) => {
+	
+	User.find({})
+		    .then(data => res.status(200).json({status: "success", data}));
+});
+
 app.post('/transfers', (req, res) => {
 	const { amount, receiver, sender } = req.body;
 		 
