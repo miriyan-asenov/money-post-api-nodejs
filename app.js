@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const port = 3000;
 
@@ -33,6 +34,16 @@ app.post('/users/signup', (req, res) => {
 	bcrypt.hash(password, 12)
 		.then(hashedP => User.create({name, idCardNumber, phoneNumber, username, password: hashedP, role}))
 		.then(data => res.status(201).json({status: "success", data}));
+});
+
+app.post('/users/login', (req, res) => {
+
+	const {username, password} = req.body;
+	
+	User.findOne({username}).select('+password')
+		.then(user => bcrypt.compare(password, user.password)
+				            .then(() => res.status(201).json({status: "success", 
+											token: jwt.sign({ id: user._id }, '1111222233334444', {expiresIn: 180000})})));			 
 });
 
 app.get('/users', (req, res) => {
