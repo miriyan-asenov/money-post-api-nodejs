@@ -1,8 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const app = express();
+
 const port = 3000;
+
+const app = express();
 
 const userSchema = new mongoose.Schema({
 		name: { type: String, required: true },
@@ -58,7 +60,14 @@ app.get('/transfers/:receiver/withdrawals', (req, res) => {
 			.then(data => res.status(200).json({status: "success", data}));	 
 });
 
+app.get('/transfers/:receiver/balance', (req, res) => {
+	
+	Transfer.aggregate([{ $match: {receiver: req.params.receiver} }, 
+						{ $group: {_id: null, balance: {$sum: '$amount'}}}])
+			.then(data => res.status(200).json({status: "success", data}));	 
+});
+
 mongoose.connect('mongodb+srv://masenov3377:CAL4y0ZeSodTjmND@cluster0.n5ty6uk.mongodb.net/myMoneyPostDB?retryWrites=true&w=majority')
-		.then(() => app.listen( port, () => {console.log(`Example app listening on port ${port}`);} ) );
+		.then(() => app.listen( port, () => {console.log(`App listening on port ${port}`);} ) );
 
  
