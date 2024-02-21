@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
 		idCardNumber: { type: String, required: true, unique: true },
 		phoneNumber: { type: String, required: true, unique: true },
 		username: { type: String, required: true, unique: true },		
-		password: { type: String, required: true },
+		password: { type: String, required: true, select: false },
 		role: { type: String, enum: ['user', 'admin'], default: 'user'}
 });
 
@@ -38,7 +38,7 @@ app.post('/users/signup', (req, res) => {
 app.get('/users', (req, res) => {
 	
 	User.find({})
-		    .then(data => res.status(200).json({status: "success", data}));
+		.then(data => res.status(200).json({status: "success", data}));
 });
 
 app.post('/transfers', (req, res) => {
