@@ -26,6 +26,15 @@ const transferSchema = new mongoose.Schema({
 
 const Transfer = mongoose.model('Transfer', transferSchema);
 
+function protectReceiver(req, res, next){
+	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+		const token = req.headers.authorization.split(' ')[1];
+		
+		User.findById( jwt.verify(token, '1111222233334444').id )
+			.then( user => (req.params.receiver === user.username) && next() );
+	}	
+}
+
 app.use(express.json()); 
 
 app.post('/users/signup', (req, res) => {
@@ -43,13 +52,7 @@ app.post('/users/login', (req, res) => {
 	User.findOne({username}).select('+password')
 		.then(user => bcrypt.compare(password, user.password)
 				            .then(() => res.status(201).json({status: "success", 
-											token: jwt.sign({ id: user._id }, '1111222233334444', {expiresIn: 180000})})));			 
-});
-
-app.get('/users', (req, res) => {
-	
-	User.find({})
-		.then(data => res.status(200).json({status: "success", data}));
+											token: jwt.sign({ id: user._id }, '1111222233334444', {expiresIn: 300})})));			 
 });
 
 app.post('/transfers', (req, res) => {
@@ -59,25 +62,32 @@ app.post('/transfers', (req, res) => {
 			.then(data => res.status(201).json({status: "success", data}));		  
 });
 
-app.get('/transfers/:receiver', (req, res) => {
+app.get('/users', (req, res) => {
+	
+	User.find({})
+		.then(data => res.status(200).json({status: "success", data}));
+});
+
+
+app.get('/transfers/:receiver', protectReceiver, (req, res) => {
 	
 	Transfer.find({receiver: req.params.receiver})
 		    .then(data => res.status(200).json({status: "success", data}));
 });
 
-app.get('/transfers/:receiver/deposits', (req, res) => {
+app.get('/transfers/:receiver/deposits', protectReceiver, (req, res) => {
 	
 	Transfer.find( {receiver: req.params.receiver, amount: {$gt: 0}} )				 
 			.then(data => res.status(200).json({status: "success", data}));	 
 });
 
-app.get('/transfers/:receiver/withdrawals', (req, res) => {
+app.get('/transfers/:receiver/withdrawals', protectReceiver, (req, res) => {
 	
 	Transfer.find( {receiver: req.params.receiver, amount: {$lt: 0}} )				 
 			.then(data => res.status(200).json({status: "success", data}));	 
 });
 
-app.get('/transfers/:receiver/balance', (req, res) => {
+app.get('/transfers/:receiver/balance', protectReceiver, (req, res) => {
 	
 	Transfer.aggregate([{ $match: {receiver: req.params.receiver} }, 
 						{ $group: {_id: null, balance: {$sum: '$amount'}}}])
