@@ -8,12 +8,12 @@ const port = 3000;
 const app = express();
 
 const userSchema = new mongoose.Schema({
-		name: { type: String, required: true },
-		idCardNumber: { type: String, required: true, unique: true },
-		phoneNumber: { type: String, required: true, unique: true },
-		username: { type: String, required: true, unique: true },		
-		password: { type: String, required: true, select: false },
-		role: { type: String, enum: ['user', 'admin'], default: 'user'}
+	name: { type: String, required: true },
+	idCardNumber: { type: String, required: true, unique: true },
+	phoneNumber: { type: String, required: true, unique: true },
+	username: { type: String, required: true, unique: true },		
+	password: { type: String, required: true, select: false },
+	role: { type: String, enum: ['user', 'admin'], default: 'user'}
 });
 
 const User = mongoose.model('User', userSchema);
@@ -35,6 +35,15 @@ function protectReceiver(req, res, next){
 	}	
 }
 
+function protectAdmin(req, res, next){
+	if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
+		const token = req.headers.authorization.split(' ')[1];
+		
+		User.findById( jwt.verify(token, '1111222233334444').id )
+			.then( user => (user.role === 'admin') && next() );
+	}	
+}
+
 app.use(express.json()); 
 
 app.post('/users/signup', (req, res) => {
@@ -46,16 +55,22 @@ app.post('/users/signup', (req, res) => {
 });
 
 app.post('/users/login', (req, res) => {
-
 	const {username, password} = req.body;
 	
 	User.findOne({username}).select('+password')
 		.then(user => bcrypt.compare(password, user.password)
-				            .then(() => res.status(201).json({status: "success", 
-											token: jwt.sign({ id: user._id }, '1111222233334444', {expiresIn: 300})})));			 
+				            .then(() => res.status(201)
+											.json({status: "success", 
+												   token: jwt.sign({ id: user._id }, 
+																	'1111222233334444', 
+																	{expiresIn: 300}
+																  )
+												  })
+								 )
+			 );			 
 });
 
-app.post('/transfers', (req, res) => {
+app.post('/transfers', protectAdmin, (req, res) => {
 	const { amount, receiver, sender } = req.body;
 		 
 	Transfer.create({ amount, receiver, sender })
