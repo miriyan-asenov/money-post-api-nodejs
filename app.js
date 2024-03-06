@@ -44,15 +44,17 @@ function protectAdmin(req, res, next){
 	}	
 }
 
-app.use(express.json()); 
-
-app.post('/users/signup', (req, res) => {
+function signup(req, res){
 	const {name, idCardNumber, phoneNumber, username, password, role} = req.body;
 		 
 	bcrypt.hash(password, 12)
-		.then(hashedP => User.create({name, idCardNumber, phoneNumber, username, password: hashedP, role}))
-		.then(data => res.status(201).json({status: "success", data}));
-});
+		  .then(hashedP => User.create({name, idCardNumber, phoneNumber, username, password: hashedP, role}))
+		  .then(data => res.status(201).json({status: "success", data}));
+}
+
+app.use(express.json()); 
+
+app.post('/users/signup', signup);
 
 app.post('/users/login', (req, res) => {
 	const {username, password} = req.body;
