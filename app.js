@@ -52,11 +52,7 @@ function signup(req, res){
 		  .then(data => res.status(201).json({status: "success", data}));
 }
 
-app.use(express.json()); 
-
-app.post('/users/signup', signup);
-
-app.post('/users/login', (req, res) => {
+function login(req, res){
 	const {username, password} = req.body;
 	
 	User.findOne({username}).select('+password')
@@ -69,8 +65,14 @@ app.post('/users/login', (req, res) => {
 																  )
 												  })
 								 )
-			 );			 
-});
+			 );
+}
+
+app.use(express.json()); 
+
+app.post('/users/signup', signup);
+
+app.post('/users/login', login);
 
 app.post('/transfers', protectAdmin, (req, res) => {
 	const { amount, receiver, sender } = req.body;
