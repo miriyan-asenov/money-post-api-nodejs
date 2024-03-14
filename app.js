@@ -68,7 +68,7 @@ function login(req, res){
 			 );
 }
 
-app.use(express.json()); 
+app.use( express.json() ); 
 
 app.post('/users/signup', signup);
 
@@ -81,12 +81,17 @@ app.post('/transfers', protectAdmin, (req, res) => {
 			.then(data => res.status(201).json({status: "success", data}));		  
 });
 
+app.get('/transfers', protectAdmin, (req, res) => {
+	
+	Transfer.find({})
+			.then(data => res.status(200).json({status: "success", data}));		  
+});
+
 app.get('/users', (req, res) => {
 	
 	User.find({})
 		.then(data => res.status(200).json({status: "success", data}));
 });
-
 
 app.get('/transfers/:receiver', protectReceiver, (req, res) => {
 	
