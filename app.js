@@ -75,6 +75,11 @@ function makeTransfer(req, res){
 			.then(data => res.status(201).json({status: "success", data}));
 }
 
+function showTransfers(req, res){
+	Transfer.find({})
+			.then(data => res.status(200).json({status: "success", data}));
+}
+
 app.use( express.json() ); 
 
 app.post('/users/signup', signup);
@@ -83,11 +88,7 @@ app.post('/users/login', login);
 
 app.post('/transfers', protectAdmin, makeTransfer);
 
-app.get('/transfers', protectAdmin, (req, res) => {
-	
-	Transfer.find({})
-			.then(data => res.status(200).json({status: "success", data}));		  
-});
+app.get('/transfers', protectAdmin, showTransfers);
 
 app.get('/users', (req, res) => {
 	
