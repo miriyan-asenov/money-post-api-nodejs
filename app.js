@@ -68,18 +68,20 @@ function login(req, res){
 			 );
 }
 
+function makeTransfer(req, res){
+	const { amount, receiver, sender } = req.body;
+		 
+	Transfer.create({ amount, receiver, sender })
+			.then(data => res.status(201).json({status: "success", data}));
+}
+
 app.use( express.json() ); 
 
 app.post('/users/signup', signup);
 
 app.post('/users/login', login);
 
-app.post('/transfers', protectAdmin, (req, res) => {
-	const { amount, receiver, sender } = req.body;
-		 
-	Transfer.create({ amount, receiver, sender })
-			.then(data => res.status(201).json({status: "success", data}));		  
-});
+app.post('/transfers', protectAdmin, makeTransfer);
 
 app.get('/transfers', protectAdmin, (req, res) => {
 	
