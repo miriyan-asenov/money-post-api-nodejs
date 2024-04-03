@@ -20,8 +20,10 @@ const User = mongoose.model('User', userSchema);
 
 const transferSchema = new mongoose.Schema({
 	amount: {type: Number, required: true},
-	receiver: {type: String, required: true},
-	sender: {type: String}
+	user: {type: String, required: true},
+	operation: { type: String, enum: ['deposited', 'withdrawn', 'sent', 'requested'], default: 'sent'},
+	sentTo: {type: String},
+	requestedBy: {type: String}
 });
 
 const Transfer = mongoose.model('Transfer', transferSchema);
