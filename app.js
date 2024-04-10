@@ -72,9 +72,9 @@ function login(req, res){
 }
 
 function adminTransfer(req, res){
-	const { amount, user, operation } = req.body;
+	const { amount, username, operation } = req.body;
 		 
-	Transfer.create({ amount, user, operation })
+	Transfer.create({ amount, username, operation })
 			.then(data => res.status(201).json({status: "success", data}));
 }
 
