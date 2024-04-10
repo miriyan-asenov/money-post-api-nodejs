@@ -71,10 +71,10 @@ function login(req, res){
 			 );
 }
 
-function makeTransfer(req, res){
-	const { amount, receiver, sender } = req.body;
+function adminTransfer(req, res){
+	const { amount, user, operation } = req.body;
 		 
-	Transfer.create({ amount, receiver, sender })
+	Transfer.create({ amount, user, operation })
 			.then(data => res.status(201).json({status: "success", data}));
 }
 
@@ -94,7 +94,7 @@ app.post('/users/signup', signup);
 
 app.post('/users/login', login);
 
-app.post('/transfers', protectAdmin, makeTransfer);
+app.post('/admin/transfers', protectAdmin, adminTransfer);
 
 app.get('/transfers', protectAdmin, showTransfers);
 
