@@ -77,7 +77,12 @@ function adminTransfer(req, res){
 			.then(data => res.status(201).json({status: "success", data}));
 }
 
-
+function userTransfer(req, res){
+	const { amount, operation, receiver } = req.body;
+		 
+	Transfer.create({ amount, username: req.params.username, operation, receiver })
+			.then(data => res.status(201).json({status: "success", data}));
+}
 
 function showTransfers(req, res){
 	Transfer.find({})
