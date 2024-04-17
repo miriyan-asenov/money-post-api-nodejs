@@ -102,6 +102,8 @@ app.post('/users/login', login);
 
 app.post('/admin/transfers', protectAdmin, adminTransfer);
 
+app.post('/:username/transfers', protectUser, userTransfer);
+
 app.get('/transfers', protectAdmin, showTransfers);
 
 app.get('/users', protectAdmin, showUsers);
