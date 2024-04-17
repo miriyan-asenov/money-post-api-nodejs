@@ -23,8 +23,7 @@ const transferSchema = new mongoose.Schema({
 	username: {type: String, required: true},
 	operation: { type: String, enum: ['deposited', 'withdrawn', 'sent', 'requested'], default: 'sent'},
 	createdAt: { type: Date, default: Date.now() },
-	sentTo: {type: String},
-	requestedFrom: {type: String}
+	receiver: {type: String}
 });
 
 const Transfer = mongoose.model('Transfer', transferSchema);
@@ -34,7 +33,7 @@ function protectUser(req, res, next){
 		const token = req.headers.authorization.split(' ')[1];
 		
 		User.findById( jwt.verify(token, '1111222233334444').id )
-			.then( user => (req.params.receiver === user.username) && next() );
+			.then( user => (req.params.username === user.username) && next() );
 	}	
 }
 
@@ -77,6 +76,8 @@ function adminTransfer(req, res){
 	Transfer.create({ amount, username, operation })
 			.then(data => res.status(201).json({status: "success", data}));
 }
+
+
 
 function showTransfers(req, res){
 	Transfer.find({})
