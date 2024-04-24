@@ -89,7 +89,55 @@ function showTransfersByUser(req, res){
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
-function showTransfers(req, res){
+function showDepositsByUser(req, res){
+	Transfer.find( { username: req.params.username, operation: 'deposited' } )
+		    .then(data => res.status(200).json({status: "success", data}));
+}
+
+function showWithdrawalsByUser(req, res){
+	Transfer.find( { username: req.params.username, operation: 'withdrawn' } )
+		    .then(data => res.status(200).json({status: "success", data}));
+}
+
+function showSendingsByUser(req, res){
+	Transfer.find( { username: req.params.username, operation: 'sent' } )
+		    .then(data => res.status(200).json({status: "success", data}));
+}
+
+function showRequestsByUser(req, res){
+	Transfer.find( { username: req.params.username, operation: 'requested' } )
+		    .then(data => res.status(200).json({status: "success", data}));
+}
+
+function showSendingsByReceiver(req, res){
+	Transfer.find( { receiver: req.params.username, operation: 'sent' } )
+		    .then(data => res.status(200).json({status: "success", data}));
+}
+
+function showRequestsByReceiver(req, res){
+	Transfer.find( { receiver: req.params.username, operation: 'requested' } )
+		    .then(data => res.status(200).json({status: "success", data}));
+}
+
+app.get('/:username/transfers', protectUser, showTransfersByUser);
+app.get('/:username/transfers/deposited', protectUser, showDepositsByUser);
+app.get('/:username/transfers/withdrawn', protectUser, showWithdrawalsByUser);
+app.get('/:username/transfers/sent', protectUser, showSendingsByUser);
+app.get('/:username/transfers/requested', protectUser, showRequestsByUser);
+app.get('/:username/transfers/receivedMoney', protectUser, showSendingsByReceiver);
+app.get('/:username/transfers/receivedRequests', protectUser, showRequestsByReceiver);
+
+app.use( express.json() ); 
+app.post('/users/signup', signup);
+app.post('/users/login', login);
+app.post('/admin/transfers', protectAdmin, adminTransfer);
+app.post('/:username/transfers', protectUser, userTransfer);
+
+mongoose.connect('mongodb+srv://masenov3377:CAL4y0ZeSodTjmND@cluster0.n5ty6uk.mongodb.net/myMoneyPostDB?retryWrites=true&w=majority')
+		.then(() => app.listen( port, () => {console.log(`App listening on port ${port}`);} ) );
+
+ /*
+ function showTransfers(req, res){
 	Transfer.find({})
 			.then(data => res.status(200).json({status: "success", data}));
 }
@@ -99,35 +147,10 @@ function showUsers(req, res){
 		.then(data => res.status(200).json({status: "success", data}));
 }
 
-app.get('/:username/transfers', protectUser, showTransfersByUser);
-
-app.use( express.json() ); 
-
-app.post('/users/signup', signup);
-
-app.post('/users/login', login);
-
-app.post('/admin/transfers', protectAdmin, adminTransfer);
-
-app.post('/:username/transfers', protectUser, userTransfer);
-
-
 
 app.get('/transfers', protectAdmin, showTransfers);
 
 app.get('/users', protectAdmin, showUsers);
-
-app.get('/transfers/:receiver/deposits', protectUser, (req, res) => {
-	
-	Transfer.find( {receiver: req.params.receiver, amount: {$gt: 0}} )				 
-			.then(data => res.status(200).json({status: "success", data}));	 
-});
-
-app.get('/transfers/:receiver/withdrawals', protectUser, (req, res) => {
-	
-	Transfer.find( {receiver: req.params.receiver, amount: {$lt: 0}} )				 
-			.then(data => res.status(200).json({status: "success", data}));	 
-});
 
 app.get('/transfers/:receiver/balance', protectUser, (req, res) => {
 	
@@ -135,8 +158,5 @@ app.get('/transfers/:receiver/balance', protectUser, (req, res) => {
 						{ $group: {_id: null, balance: {$sum: '$amount'}}}])
 			.then(data => res.status(200).json({status: "success", data}));	 
 });
-
-mongoose.connect('mongodb+srv://masenov3377:CAL4y0ZeSodTjmND@cluster0.n5ty6uk.mongodb.net/myMoneyPostDB?retryWrites=true&w=majority')
-		.then(() => app.listen( port, () => {console.log(`App listening on port ${port}`);} ) );
-
  
+ */
