@@ -84,6 +84,11 @@ function userTransfer(req, res){
 			.then(data => res.status(201).json({status: "success", data}));
 }
 
+function showTransfersByUser(req, res){
+	Transfer.find( { $or: [{username: req.params.username},{receiver: req.params.username}] } )
+		    .then(data => res.status(200).json({status: "success", data}));
+}
+
 function showTransfers(req, res){
 	Transfer.find({})
 			.then(data => res.status(200).json({status: "success", data}));
@@ -93,6 +98,8 @@ function showUsers(req, res){
 	User.find({})
 		.then(data => res.status(200).json({status: "success", data}));
 }
+
+app.get('/:username/transfers', protectUser, showTransfersByUser);
 
 app.use( express.json() ); 
 
@@ -104,15 +111,11 @@ app.post('/admin/transfers', protectAdmin, adminTransfer);
 
 app.post('/:username/transfers', protectUser, userTransfer);
 
+
+
 app.get('/transfers', protectAdmin, showTransfers);
 
 app.get('/users', protectAdmin, showUsers);
-
-app.get('/transfers/:receiver', protectUser, (req, res) => {
-	
-	Transfer.find({receiver: req.params.receiver})
-		    .then(data => res.status(200).json({status: "success", data}));
-});
 
 app.get('/transfers/:receiver/deposits', protectUser, (req, res) => {
 	
