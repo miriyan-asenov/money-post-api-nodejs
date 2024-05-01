@@ -126,6 +126,7 @@ app.get('/:username/transfers/sent', protectUser, showSendingsByUser);
 app.get('/:username/transfers/requested', protectUser, showRequestsByUser);
 app.get('/:username/transfers/receivedMoney', protectUser, showSendingsByReceiver);
 app.get('/:username/transfers/receivedRequests', protectUser, showRequestsByReceiver);
+app.get('/:username/balance', protectUser, showUserBalance);
 
 app.use( express.json() ); 
 app.post('/users/signup', signup);
@@ -158,5 +159,14 @@ app.get('/transfers/:receiver/balance', protectUser, (req, res) => {
 						{ $group: {_id: null, balance: {$sum: '$amount'}}}])
 			.then(data => res.status(200).json({status: "success", data}));	 
 });
+
+Transfer.aggregate( [
+						{ $match: { { $or: [ $username: req.params.username, { $and: [ $operation: "sent", $receiver: req.params.username ] } ] } } },
+						{},
+						{}
+					] 
+				  );
+ { $or: [ $username: req.params.username, { $and: [ $operation: "sent", $receiver: req.params.username ] } ] }
  
+ { $and: [ $operation: "sent", $receiver: req.params.username ] }
  */
