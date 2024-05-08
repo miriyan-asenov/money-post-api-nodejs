@@ -119,6 +119,13 @@ function showRequestsByReceiver(req, res){
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
+function showUserBalance(req, res){
+	Transfer.aggregate([{ $match: { $or: [ {username: req.params.username}, {receiver: req.params.username} ] } },
+						{ $group: { _id: {username: "$username", operation: "$operation"}, total: {$sum: "$amount"} } }
+					   ])
+			.then(data => res.status(200).json({status: "success", data}));
+}
+
 app.get('/:username/transfers', protectUser, showTransfersByUser);
 app.get('/:username/transfers/deposited', protectUser, showDepositsByUser);
 app.get('/:username/transfers/withdrawn', protectUser, showWithdrawalsByUser);
@@ -161,9 +168,8 @@ app.get('/transfers/:receiver/balance', protectUser, (req, res) => {
 });
 
 Transfer.aggregate( [
-						{ $match: { { $or: [ $username: req.params.username, { $and: [ $operation: "sent", $receiver: req.params.username ] } ] } } },
-						{},
-						{}
+						{ $match: { { $or: [ {username: req.params.username}, {receiver: req.params.username} ] } } },
+						 
 					] 
 				  );
  { $or: [ $username: req.params.username, { $and: [ $operation: "sent", $receiver: req.params.username ] } ] }
