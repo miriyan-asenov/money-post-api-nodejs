@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema({
 	active: { type: Boolean, default: true, select: false }
 });
 
+userSchema.pre('find', function(next) {
+  // this points to the current query
+  this.find({ active: true });
+  next();
+});
+
 const User = mongoose.model('User', userSchema);
 
 const transferSchema = new mongoose.Schema({
