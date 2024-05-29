@@ -132,6 +132,11 @@ function deleteCurrentUser(req, res){
 		    .then(data => res.status(204).json({status: "success", data: null}));
 }
 
+function showAllUsers(req, res){
+	User.find({})
+		.then(data => res.status(200).json({status: "success", data}));
+}
+
 app.get('/:username/transfers', protectUser, showTransfersByUser);
 app.get('/:username/transfers/deposited', protectUser, showDepositsByUser);
 app.get('/:username/transfers/withdrawn', protectUser, showWithdrawalsByUser);
@@ -141,6 +146,7 @@ app.get('/:username/transfers/receivedMoney', protectUser, showSendingsByReceive
 app.get('/:username/transfers/receivedRequests', protectUser, showRequestsByReceiver);
 app.get('/:username/balance', protectUser, showUserBalance);
 app.get('/:username/delete', protectUser, deleteCurrentUser);
+app.get('/admin/users', protectAdmin, showAllUsers);
 
 app.use( express.json() ); 
 app.post('/users/signup', signup);
