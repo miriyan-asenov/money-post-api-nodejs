@@ -27,7 +27,7 @@ const User = mongoose.model('User', userSchema);
 
 const transferSchema = new mongoose.Schema({
 	amount: {type: Number, required: true},
-	username: {type: String, required: true},
+	initiator: {type: String, required: true},
 	operation: { type: String, enum: ['deposited', 'withdrawn', 'sent', 'requested'], default: 'sent'},
 	createdAt: { type: Date, default: Date.now() },
 	receiver: {type: String}
@@ -78,46 +78,46 @@ function login(req, res){
 }
 
 function adminTransfer(req, res){
-	const { amount, username, operation } = req.body;
+	const { amount, initiator, operation } = req.body;
 		 
-	Transfer.create({ amount, username, operation })
+	Transfer.create({ amount, initiator, operation })
 			.then(data => res.status(201).json({status: "success", data}));
 }
 
 function userTransfer(req, res){
 	const { amount, operation, receiver } = req.body;
 		 
-	Transfer.create({ amount, username: req.params.username, operation, receiver })
+	Transfer.create({ amount, initiator: req.params.username, operation, receiver })
 			.then(data => res.status(201).json({status: "success", data}));
 }
 
 function showTransfersByUser(req, res){
-	Transfer.find( { $or: [{username: req.params.username},{receiver: req.params.username}] } )
+	Transfer.find( { $or: [{initiator: req.params.username},{receiver: req.params.username}] } )
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
 function showDepositsByUser(req, res){
-	Transfer.find( { username: req.params.username, operation: 'deposited' } )
+	Transfer.find( { initiator: req.params.username, operation: 'deposited' } )
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
 function showWithdrawalsByUser(req, res){
-	Transfer.find( { username: req.params.username, operation: 'withdrawn' } )
+	Transfer.find( { initiator: req.params.username, operation: 'withdrawn' } )
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
 function showSendingsByUser(req, res){
-	Transfer.find( { username: req.params.username, operation: 'sent' } )
+	Transfer.find( { initiator: req.params.username, operation: 'sent' } )
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
 function showRequestsByUser(req, res){
-	Transfer.find( { username: req.params.username, operation: 'requested' } )
+	Transfer.find( { initiator: req.params.username, operation: 'requested' } )
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
 function showSendingsByReceiver(req, res){
-	Transfer.find( { receiver: req.params.username, operation: 'sent' } )
+	Transfer.find( { initiator: req.params.username, operation: 'sent' } )
 		    .then(data => res.status(200).json({status: "success", data}));
 }
 
@@ -127,8 +127,8 @@ function showRequestsByReceiver(req, res){
 }
 
 function showUserBalance(req, res){
-	Transfer.aggregate([{ $match: { $or: [ {username: req.params.username}, {receiver: req.params.username} ] } },
-						{ $group: { _id: {username: "$username", operation: "$operation"}, total: {$sum: "$amount"} } }
+	Transfer.aggregate([{ $match: { $or: [ {initiator: req.params.username}, {receiver: req.params.username} ] } },
+						{ $group: { _id: {initiator: "$initiator", operation: "$operation"}, total: {$sum: "$amount"} } }
 					   ])
 			.then(data => res.status(200).json({status: "success", data}));
 }
