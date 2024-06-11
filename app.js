@@ -57,8 +57,8 @@ function signup(req, res){
 	const {name, idCardNumber, phoneNumber, username, password, role} = req.body;
 		 
 	bcrypt.hash(password, 12)
-		  .then(hashedP => User.create({name, idCardNumber, phoneNumber, username, password: hashedP, role}))
-		  .then(data => res.status(201).json({status: "success", data}));
+		  .then(hashedP => User.create({name, idCardNumber, phoneNumber, username, password: hashedP, role})
+		                       .then(data => res.status(201).json({status: "success", data})));
 }
 
 function login(req, res){
@@ -68,10 +68,7 @@ function login(req, res){
 		.then(user => bcrypt.compare(password, user.password)
 				            .then(() => res.status(201)
 											.json({status: "success", 
-												   token: jwt.sign({ id: user._id }, 
-																	'1111222233334444', 
-																	{expiresIn: 300}
-																  )
+												   token: jwt.sign({ id: user._id }, '1111222233334444', {expiresIn: 300})
 												  })
 								 )
 			 );
